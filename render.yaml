@@ -1,0 +1,39 @@
+services:
+  # ── Backend — Node.js/Express API ──────────────────────────────
+  - type: web
+    name: lastmile-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npx prisma migrate deploy
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: postgresql://last_mile_delivery_mmks_user:wO9NDlZiBEEhXR4iAfkgPGeUPlBVA61X@dpg-da4b7ibm8hqs73e77d3g-a.oregon-postgres.render.com/last_mile_delivery_mmks
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: PORT
+        value: 5000
+      # Set FRONTEND_URL after frontend deploys — update this to your Render frontend URL
+      - key: FRONTEND_URL
+        value: https://lastmile-frontend.onrender.com
+
+  # ── Frontend — React/Vite Static Site ───────────────────────────
+  - type: web
+    name: lastmile-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      # Set this to the backend service URL from Render after backend deploys
+      - key: VITE_API_URL
+        value: https://lastmile-backend.onrender.com/api
+    routes:
+      # SPA fallback — all routes go to index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html
