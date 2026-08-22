@@ -1,0 +1,235 @@
+// This is your Prisma schema file
+// Last-Mile Delivery Tracker
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  AGENT
+  ADMIN
+}
+
+enum OrderType {
+  B2B
+  B2C
+}
+
+enum PaymentType {
+  PREPAID
+  COD
+}
+
+enum OrderStatus {
+  CREATED
+  AGENT_ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RESCHEDULED
+  CANCELLED
+}
+
+// ─────────────────────────────────────────────
+// USERS & AUTH
+// ─────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String   @map("password_hash")
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  agentProfile    AgentProfile?
+  placedOrders    Order[]         @relation("CustomerOrders")
+  createdOrders   Order[]         @relation("CreatedByAdmin")
+  assignedOrders  Order[]         @relation("AgentOrders")
+  trackingEntries TrackingHistory[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// ZONES & AREAS
+// ─────────────────────────────────────────────
+
+model Zone {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  areas         Area[]
+  agentProfiles AgentProfile[]
+  pickupOrders  Order[]        @relation("PickupZone")
+  dropOrders    Order[]        @relation("DropZone")
+  fromRateCards RateCard[]     @relation("FromZone")
+  toRateCards   RateCard[]     @relation("ToZone")
+
+  @@map("zones")
+}
+
+model Area {
+  id      String @id @default(cuid())
+  name    String
+  pincode String @unique
+  zoneId  String @map("zone_id")
+  zone    Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@map("areas")
+}
+
+// ─────────────────────────────────────────────
+// RATE CARDS & PRICING
+// ─────────────────────────────────────────────
+
+model RateCard {
+  id          String    @id @default(cuid())
+  zoneFromId  String    @map("zone_from_id")
+  zoneToId    String    @map("zone_to_id")
+  orderType   OrderType @map("order_type")
+  ratePerKg   Float     @map("rate_per_kg")
+  minCharge   Float     @default(0) @map("min_charge")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  zoneFrom Zone @relation("FromZone", fields: [zoneFromId], references: [id])
+  zoneTo   Zone @relation("ToZone", fields: [zoneToId], references: [id])
+
+  @@unique([zoneFromId, zoneToId, orderType])
+  @@map("rate_cards")
+}
+
+model CodSurcharge {
+  id            String    @id @default(cuid())
+  orderType     OrderType @unique @map("order_type")
+  surchargeFlat Float     @default(0) @map("surcharge_flat")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("cod_surcharges")
+}
+
+// ─────────────────────────────────────────────
+// AGENT PROFILES
+// ─────────────────────────────────────────────
+
+model AgentProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique @map("user_id")
+  zoneId      String   @map("zone_id")
+  isAvailable Boolean  @default(true) @map("is_available")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  zone Zone @relation(fields: [zoneId], references: [id])
+
+  @@map("agent_profiles")
+}
+
+// ─────────────────────────────────────────────
+// ORDERS
+// ─────────────────────────────────────────────
+
+model Order {
+  id              String      @id @default(cuid())
+  customerId      String      @map("customer_id")
+  agentId         String?     @map("agent_id")
+  createdById     String?     @map("created_by_id")
+
+  // Addresses
+  pickupAddress   String      @map("pickup_address")
+  pickupPincode   String      @map("pickup_pincode")
+  dropAddress     String      @map("drop_address")
+  dropPincode     String      @map("drop_pincode")
+
+  // Zones (detected from pincodes)
+  pickupZoneId    String?     @map("pickup_zone_id")
+  dropZoneId      String?     @map("drop_zone_id")
+
+  // Package dimensions
+  length          Float
+  breadth         Float
+  height          Float
+  actualWeight    Float       @map("actual_weight")
+  volumetricWeight Float      @map("volumetric_weight")
+  billableWeight  Float       @map("billable_weight")
+
+  // Order metadata
+  orderType       OrderType   @map("order_type")
+  paymentType     PaymentType @map("payment_type")
+
+  // Charges (computed at creation, stored immutably)
+  baseCharge      Float       @map("base_charge")
+  codSurcharge    Float       @default(0) @map("cod_surcharge")
+  totalCharge     Float       @map("total_charge")
+
+  // Status
+  status          OrderStatus @default(CREATED)
+  scheduledDate   DateTime?   @map("scheduled_date")
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  customer        User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  agent           User?       @relation("AgentOrders", fields: [agentId], references: [id])
+  createdBy       User?       @relation("CreatedByAdmin", fields: [createdById], references: [id])
+  pickupZone      Zone?       @relation("PickupZone", fields: [pickupZoneId], references: [id])
+  dropZone        Zone?       @relation("DropZone", fields: [dropZoneId], references: [id])
+  trackingHistory TrackingHistory[]
+  rescheduleRequests RescheduleRequest[]
+
+  @@map("orders")
+}
+
+// ─────────────────────────────────────────────
+// TRACKING HISTORY (IMMUTABLE AUDIT LOG)
+// ─────────────────────────────────────────────
+
+model TrackingHistory {
+  id          String      @id @default(cuid())
+  orderId     String      @map("order_id")
+  status      OrderStatus
+  changedById String?     @map("changed_by_id")
+  changedByRole Role?     @map("changed_by_role")
+  note        String?
+  timestamp   DateTime    @default(now())
+
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedBy User?  @relation(fields: [changedById], references: [id])
+
+  @@map("tracking_history")
+}
+
+// ─────────────────────────────────────────────
+// RESCHEDULE REQUESTS
+// ─────────────────────────────────────────────
+
+model RescheduleRequest {
+  id          String   @id @default(cuid())
+  orderId     String   @map("order_id")
+  newDate     DateTime @map("new_date")
+  requestedAt DateTime @default(now()) @map("requested_at")
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("reschedule_requests")
+}
