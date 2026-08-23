@@ -45,6 +45,7 @@ export default function PlaceOrderPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
   const [breakdown, setBreakdown] = useState(null);
+  const [selectedRateType, setSelectedRateType] = useState('STANDARD');
   const [calcLoading, setCalcLoading] = useState(false);
   const [orderLoading, setOrderLoading] = useState(false);
   const [error, setError] = useState('');

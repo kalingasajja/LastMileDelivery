@@ -102,14 +102,11 @@ export default function LandingPage() {
             <a href="#stats" className="landing-nav-link">Why Us</a>
           </div>
           <div className="landing-nav-cta">
-            {dashboardLink ? (
-              <Link to={dashboardLink} className="btn btn-primary btn-sm">Go to Dashboard</Link>
-            ) : (
-              <>
-                <Link to="/login" className="btn btn-ghost btn-sm">Log In</Link>
-                <Link to="/register" className="btn btn-primary btn-sm">Sign Up Free</Link>
-              </>
+            {dashboardLink && (
+              <Link to={dashboardLink} className="btn btn-ghost btn-sm" style={{ marginRight: 4 }}>Dashboard</Link>
             )}
+            <Link to="/login" className="btn btn-ghost btn-sm">Log In</Link>
+            <Link to="/register" className="btn btn-primary btn-sm">Sign Up</Link>
           </div>
         </div>
       </nav>
@@ -141,19 +138,13 @@ export default function LandingPage() {
             </p>
 
             <div className="hero-actions">
-              {dashboardLink ? (
-                <Link to={dashboardLink} className="btn btn-primary btn-lg hero-btn-primary">
-                  Go to Dashboard →
+              <Link to={dashboardLink || '/register'} className="btn btn-primary btn-lg hero-btn-primary">
+                Get Started →
+              </Link>
+              {!user && (
+                <Link to="/login" className="btn btn-ghost btn-lg">
+                  Log In
                 </Link>
-              ) : (
-                <>
-                  <Link to="/register" className="btn btn-primary btn-lg hero-btn-primary">
-                    Get Started Free →
-                  </Link>
-                  <Link to="/login" className="btn btn-ghost btn-lg">
-                    Sign In
-                  </Link>
-                </>
               )}
             </div>
 

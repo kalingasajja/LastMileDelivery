@@ -78,13 +78,13 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: 20, color: 'var(--text-secondary)', fontSize: 14 }}>
+        <p style={{ textAlign: 'center', marginTop: 20, color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>
           Don't have an account?{' '}
-          <Link to="/register" style={{ color: 'var(--primary-light)' }}>Register</Link>
+          <Link to="/register" style={{ color: '#60a5fa', fontWeight: 600 }}>Register</Link>
         </p>
 
-        <div style={{ marginTop: 20, padding: '12px 16px', background: 'var(--bg-elevated)', borderRadius: 'var(--radius)', fontSize: 12, color: 'var(--text-muted)' }}>
-          <strong style={{ color: 'var(--text-secondary)' }}>Demo credentials:</strong><br />
+        <div style={{ marginTop: 20, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+          <strong style={{ color: 'rgba(255,255,255,0.6)' }}>Demo credentials:</strong><br />
           Admin: admin@lastmile.com / admin123<br />
           Customer: customer@test.com / customer123<br />
           Agent: agent1@lastmile.com / agent123
