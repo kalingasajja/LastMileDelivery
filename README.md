@@ -1,73 +1,113 @@
 # 🚚 Last-Mile Delivery Tracker
 
-A full-stack delivery management platform with intelligent pricing, smart agent assignment, and real-time order tracking.
+A production-ready full-stack delivery management platform featuring a dynamic rate calculation engine, intelligent agent auto-assignment, immutable tracking history, and multi-city zone coverage.
 
-**Tech Stack:** React + Node.js + PostgreSQL + Prisma
+**Tech Stack:** React (Vite) + Node.js (Express) + PostgreSQL + Prisma ORM + Nodemailer + Fast2SMS
+
+---
+
+## 🌐 Live Deployment & Demo
+
+- **Frontend Application**: `https://lastmiledelivery-frontend-static.onrender.com`
+- **Backend REST API**: `https://lastmiledelivery-ntvx.onrender.com/api`
+- **System Design Document**: [`system-design.md`](file:///c:/Users/kalin/LastMileDelivery/system-design.md)
 
 ---
 
 ## 📋 Table of Contents
-- [Features](#features)
-- [Architecture](#architecture)
-- [Setup Guide](#setup-guide)
-- [Database Schema](#database-schema)
-- [API Documentation](#api-documentation)
-- [Rate Calculation Logic](#rate-calculation-logic)
-- [Environment Variables](#environment-variables)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [City & Zone Coverage](#-city--zone-coverage)
+- [Setup Guide](#-setup-guide)
+- [Database Schema](#-database-schema)
+- [API Documentation](#-api-documentation)
+- [Rate Calculation Logic](#-rate-calculation-logic)
+- [Environment Variables](#-environment-variables)
 
 ---
 
 ## ✨ Features
 
-### Customer
-- Register, login, place orders
-- Real-time charge preview before confirming
-- Live order tracking with immutable status timeline
-- Email + SMS notifications on every status change
-- Reschedule failed deliveries
+### Customer Portal
+- **Dark Landing Page**: Modern glassmorphic hero page with interactive feature highlights.
+- **Order Booking Flow**: Structured address input (Line 1, Area, City, Pincode) with auto-zone lookup on blur.
+- **Speed & Rate Options**: Instant price breakdown across delivery speed tiers (*Standard*, *Express*, *Same-Day*).
+- **Public & Authenticated Tracking**: Immutable milestone tracking timeline viewable via direct URL (`/track/:id`) without login requirement.
+- **Reschedule Flow**: Customer portal enables easy rescheduling for failed delivery attempts.
 
-### Admin
-- Manage zones and pincode-to-zone mappings
-- Configure rate cards (B2B/B2C, intra/inter-zone)
-- Set COD surcharges per order type
-- View all orders with status/zone/agent filters
-- Auto-assign or manually assign delivery agents
-- Override any order status
+### Admin Dashboard
+- **Coverage & Zone Management**: Configure city zones and map 6-digit pincodes.
+- **Dynamic Rate Cards**: Set intra-zone, inter-zone, B2B, and B2C rates per KG with minimum charge floors.
+- **COD Surcharges**: Configure flat COD fees per order type.
+- **Order Management & Auto-Assignment**: Overview charts, pending order queues, and one-click agent assignment.
+- **Fleet Control**: Manage agent accounts, zone allocations, and availability toggles.
 
-### Delivery Agent
-- View assigned orders
-- Update delivery status (Picked Up → Delivered / Failed)
-- Toggle availability
+### Delivery Agent App
+- **Assigned Queue**: View active orders assigned to the agent.
+- **Status Updates**: Update order status (`Picked Up` → `In Transit` → `Out for Delivery` → `Delivered` / `Failed`).
+- **Availability Toggle**: Switch operational status (`Available` / `Busy`).
 
 ---
 
 ## 🏗️ Architecture
 
+```mermaid
+graph TD
+    A[Customer Portal] --> B[JWT Auth Guard]
+    C[Admin Dashboard] --> B
+    D[Public Tracking Page] --> E[Order Service]
+
+    B --> E
+    E --> F[Rate Calculation Engine]
+    E --> G[Zone Detection Service]
+    E --> H[Auto Assignment Engine]
+    E --> I[PostgreSQL Database]
+
+    F --> I
+    G --> I
+    H --> I
+    E --> J[Notification Service]
+    J --> K[Nodemailer Email Service]
+    J --> L[Fast2SMS SMS Service]
 ```
-last-mile-delivery/
-├── backend/              # Node.js + Express + Prisma
+
+### Directory Structure
+```text
+LastMileDelivery/
+├── backend/              # Node.js + Express + Prisma ORM
 │   ├── prisma/
-│   │   └── schema.prisma
+│   │   ├── schema.prisma
+│   │   ├── seed.js       # Seed users, initial zones & 192 rate cards
+│   │   └── add_zones.js  # Add Bengaluru, Hyderabad & Vijayawada
 │   ├── src/
 │   │   ├── routes/       # Auth, orders, zones, areas, rate cards, agents
-│   │   ├── services/
-│   │   │   ├── rateEngine.js     # Core pricing engine
-│   │   │   ├── zoneDetector.js   # Pincode → zone
-│   │   │   ├── autoAssign.js     # Agent assignment logic
-│   │   │   └── notifier.js       # Email + SMS
-│   │   ├── middleware/
-│   │   │   └── auth.middleware.js
+│   │   ├── services/     # Rate Engine, Zone Detector, Auto-Assign, Notifier
+│   │   ├── middleware/   # JWT Auth & Role Guard
 │   │   └── index.js
 │   └── .env.example
-└── frontend/             # React + Vite
-    └── src/
-        ├── pages/
-        │   ├── customer/  # Dashboard, PlaceOrder, OrderDetail
-        │   ├── admin/     # Layout, Overview, Orders, Zones, RateCards, Agents
-        │   └── agent/     # AgentDashboard
-        ├── context/       # AuthContext
-        └── lib/           # api.js, utils.jsx
+├── frontend/             # React (Vite) SPA
+│   ├── src/
+│   │   ├── pages/        # Customer, Admin, Agent, TrackOrder, Landing, Auth
+│   │   ├── context/      # AuthContext
+│   │   └── lib/          # API Axios Client & Utilities
+├── render.yaml           # Render Infrastructure Blueprint
+└── system-design.md      # Detailed Architecture Write-Up & Mermaid Diagrams
 ```
+
+---
+
+## 🗺️ City & Zone Coverage
+
+The system supports multi-city delivery networks seeded out-of-the-box:
+
+| City | Zones | Sample Pincodes Mapped |
+|---|---|---|
+| **Mumbai** | North Mumbai, South Mumbai | `400066`, `400069`, `400001`, `400018` |
+| **Thane & Navi Mumbai** | Thane, Navi Mumbai | `400601`, `400080`, `400703`, `410210` |
+| **Pune** | Pune | `411005`, `411028`, `411038` |
+| **Bengaluru** | Central, East, North | `560001`, `560066`, `560024`, `560100` |
+| **Hyderabad** | Central, West | `500003`, `500016`, `500081`, `500032` |
+| **Vijayawada** | Vijayawada | `520010`, `520002`, `520001`, `520007` |
 
 ---
 
@@ -75,10 +115,9 @@ last-mile-delivery/
 
 ### Prerequisites
 - Node.js >= 18
-- PostgreSQL database (local or [Railway](https://railway.app))
+- PostgreSQL Database
 
-### 1. Clone & Install
-
+### 1. Clone & Install Dependencies
 ```bash
 # Install backend dependencies
 cd backend
@@ -89,189 +128,123 @@ cd ../frontend
 npm install
 ```
 
-### 2. Configure Environment
-
+### 2. Configure Environment Variables
 ```bash
-# Copy and fill in your values
 cp backend/.env.example backend/.env
 ```
 
-Required: `DATABASE_URL`, `JWT_SECRET`
-Optional: `EMAIL_*` (Nodemailer), `FAST2SMS_API_KEY` (SMS)
-
-### 3. Initialize Database
-
+### 3. Initialize & Seed Database
 ```bash
 cd backend
-
-# Run migrations
 npx prisma migrate dev --name init
-
-# Seed with sample data
 node src/prisma/seed.js
+node src/prisma/add_zones.js
 ```
 
-### 4. Run
-
+### 4. Start Development Servers
 ```bash
-# Terminal 1 - Backend (port 5000)
+# Backend (Port 5000)
 cd backend
 npm run dev
 
-# Terminal 2 - Frontend (port 5173)
+# Frontend (Port 5173)
 cd frontend
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-### Default Credentials (after seed)
+### Default Seed Credentials
 | Role | Email | Password |
 |---|---|---|
-| Admin | admin@lastmile.com | admin123 |
-| Customer | customer@test.com | customer123 |
-| Agent 1 | agent1@lastmile.com | agent123 |
-| Agent 2 | agent2@lastmile.com | agent123 |
+| **Admin** | `admin@lastmile.com` | `admin123` |
+| **Customer** | `customer@test.com` | `customer123` |
+| **Agent 1** | `agent1@lastmile.com` | `agent123` |
+| **Agent 2** | `agent2@lastmile.com` | `agent123` |
 
 ---
 
 ## 🗄️ Database Schema
 
-```
-users            → id, name, email, phone, password_hash, role (CUSTOMER|AGENT|ADMIN)
-agent_profiles   → id, user_id, zone_id, is_available
-zones            → id, name
-areas            → id, name, pincode (UNIQUE), zone_id      ← zone detection key
-rate_cards       → id, zone_from_id, zone_to_id, order_type (B2B|B2C), rate_per_kg, min_charge
-                   UNIQUE(zone_from_id, zone_to_id, order_type)
-cod_surcharges   → id, order_type (UNIQUE), surcharge_flat
-orders           → id, customer_id, agent_id, pickup/drop address+pincode+zone,
-                   length, breadth, height, actual_weight, volumetric_weight, billable_weight,
-                   order_type, payment_type, base_charge, cod_surcharge, total_charge,
-                   status, scheduled_date
-tracking_history → id, order_id, status, changed_by_id, changed_by_role, note, timestamp
-                   ← APPEND-ONLY, never modified
-reschedule_requests → id, order_id, new_date, requested_at
-```
+- `users` $\rightarrow$ `id, name, email, phone, password_hash, role (CUSTOMER|AGENT|ADMIN)`
+- `agent_profiles` $\rightarrow$ `id, user_id, zone_id, is_available`
+- `zones` $\rightarrow$ `id, name`
+- `areas` $\rightarrow$ `id, name, pincode (UNIQUE), zone_id`
+- `rate_cards` $\rightarrow$ `id, zone_from_id, zone_to_id, order_type (B2B|B2C), rate_per_kg, min_charge`
+- `cod_surcharges` $\rightarrow$ `id, order_type (UNIQUE), surcharge_flat`
+- `orders` $\rightarrow$ `id, customer_id, agent_id, pickup/drop details, weight, volumetric_weight, billable_weight, charges, status, scheduled_date`
+- `tracking_history` $\rightarrow$ `id, order_id, status, changed_by_id, changed_by_role, note, timestamp` *(Append-Only)*
+- `reschedule_requests` $\rightarrow$ `id, order_id, new_date, requested_at`
 
 ---
 
 ## 📡 API Documentation
 
 ### Auth
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | /api/auth/register | None | Register new customer |
-| POST | /api/auth/login | None | Login (all roles) |
-| GET | /api/auth/me | Bearer | Get current user |
+| POST | `/api/auth/register` | Public | Register new customer |
+| POST | `/api/auth/login` | Public | Authenticate user (all roles) |
+| GET | `/api/auth/me` | Bearer | Fetch current user profile |
 
-### Orders
-| Method | Endpoint | Auth | Description |
+### Orders & Tracking
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | /api/orders/calculate | Any | Preview charge (no order created) |
-| POST | /api/orders | Any | Create order |
-| GET | /api/orders | Any | List orders (role-filtered) |
-| GET | /api/orders/:id | Any | Order detail + tracking history |
-| POST | /api/orders/:id/auto-assign | Admin | Auto-assign nearest agent |
-| POST | /api/orders/:id/assign | Admin | Manually assign agent |
-| PATCH | /api/orders/:id/status | Agent/Admin | Update status (immutable log) |
-| POST | /api/orders/:id/reschedule | Customer/Admin | Reschedule failed delivery |
+| POST | `/api/orders/calculate` | Public | Calculate rate options without placing order |
+| POST | `/api/orders` | Auth | Create order |
+| GET | `/api/orders` | Auth | List orders (filtered by role) |
+| GET | `/api/orders/:id` | Auth | Get order details & tracking history |
+| GET | `/api/orders/:id/track` | Public | Safe public tracking endpoint (no auth/PII) |
+| POST | `/api/orders/:id/auto-assign` | Admin | Auto-assign nearest available agent |
+| POST | `/api/orders/:id/assign` | Admin | Manually assign agent |
+| PATCH | `/api/orders/:id/status` | Agent/Admin | Update order status (appends audit log) |
+| POST | `/api/orders/:id/reschedule` | Customer/Admin | Reschedule failed delivery |
 
 ### Zones & Areas
-| Method | Endpoint | Auth | Description |
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| GET | /api/zones | Any | List all zones |
-| POST | /api/zones | Admin | Create zone |
-| PUT | /api/zones/:id | Admin | Update zone |
-| DELETE | /api/zones/:id | Admin | Delete zone |
-| GET | /api/areas | Any | List areas |
-| GET | /api/areas/lookup/:pincode | Any | Resolve pincode to zone |
-| POST | /api/areas | Admin | Map pincode to zone |
-
-### Rate Cards & COD
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | /api/rate-cards | Any | List rate cards |
-| POST | /api/rate-cards | Admin | Create rate card |
-| PUT | /api/rate-cards/:id | Admin | Update rate |
-| DELETE | /api/rate-cards/:id | Admin | Delete rate card |
-| GET | /api/cod-surcharges | Any | List COD surcharges |
-| PUT | /api/cod-surcharges/:orderType | Admin | Upsert COD surcharge |
-
-### Agents
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | /api/agents | Admin | List all agents |
-| POST | /api/agents | Admin | Create agent account |
-| PUT | /api/agents/:id | Admin | Update agent zone/availability |
-| PATCH | /api/agents/availability | Agent | Toggle own availability |
-| GET | /api/agents/me | Agent | Agent's own profile |
+| GET | `/api/zones` | Public | List all zones |
+| POST | `/api/zones` | Admin | Create new zone |
+| PUT | `/api/zones/:id` | Admin | Update zone name |
+| DELETE | `/api/zones/:id` | Admin | Remove zone |
+| GET | `/api/areas` | Public | List all mapped areas |
+| GET | `/api/areas/lookup/:pincode` | Public | Resolve pincode to zone |
+| POST | `/api/areas` | Admin | Map new pincode to zone |
 
 ---
 
 ## 💰 Rate Calculation Logic
 
-The rate engine (`backend/src/services/rateEngine.js`) follows this pipeline:
+```text
+INPUT: pickupPincode, dropPincode, L, B, H, actualWeight, orderType, paymentType, rateType
 
-```
-INPUT: pickupPincode, dropPincode, L, B, H, actualWeight, orderType, paymentType
-
-STEP 1: Pincode → Zone Detection
+STEP 1: Pincode → Zone Lookup
   areas table: WHERE pincode = pickupPincode → pickup_zone_id
   areas table: WHERE pincode = dropPincode   → drop_zone_id
 
-STEP 2: Rate Card Lookup
-  rate_cards: WHERE zone_from_id = pickup_zone AND zone_to_id = drop_zone AND order_type = B2B|B2C
-  → Intra-zone if zone_from = zone_to (same rate card covers it)
-  → Inter-zone if zone_from ≠ zone_to
-
-STEP 3: Volumetric Weight
+STEP 2: Volumetric & Billable Weight
   volumetric_weight = (L × B × H) / 5000
-
-STEP 4: Billable Weight
   billable_weight = MAX(actual_weight, volumetric_weight)
 
-STEP 5: Base Charge
+STEP 3: Base Charge Calculation
+  rate_cards: WHERE zone_from_id = pickup_zone AND zone_to_id = drop_zone AND order_type = orderType
   raw_charge = billable_weight × rate_per_kg
-  base_charge = MAX(raw_charge, min_charge)    ← respects minimum charge floor
+  base_charge = MAX(raw_charge, min_charge)
 
-STEP 6: COD Surcharge (if paymentType = COD)
-  cod_surcharges: WHERE order_type = B2B|B2C → surcharge_flat
+STEP 4: Speed Tier Adjustment
+  - Standard: base_charge × 1.0
+  - Express: base_charge × 1.3
+  - Same-Day: base_charge × 1.6
 
-STEP 7: Total
+STEP 5: COD Surcharge & Total
+  cod_surcharges: WHERE order_type = B2B|B2C → surcharge_flat (if COD)
   total_charge = base_charge + cod_surcharge
 ```
 
-**Zero hardcoding** — all rates, minimums, and surcharges are read from DB and configurable by admin.
-
 ---
 
-## 🔔 Notifications
+## 🔔 Notifications & Communication
 
-- **Email**: Nodemailer (Gmail SMTP or any SMTP). HTML template with tracking link.
-- **SMS**: Fast2SMS bulk API (India). Triggered on key events.
-- Both are non-blocking and non-fatal — notification failure does not break order flow.
-
----
-
-## ⚙️ Environment Variables
-
-See `backend/.env.example`:
-
-```env
-DATABASE_URL="postgresql://..."
-JWT_SECRET="your-secret"
-JWT_EXPIRES_IN="7d"
-PORT=5000
-
-# Email (optional)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your@gmail.com
-EMAIL_PASS=your-app-password
-
-# Fast2SMS (optional)
-FAST2SMS_API_KEY=your-key
-
-FRONTEND_URL=http://localhost:5173
-```
+- **Email Dispatch**: Built with Nodemailer (HTML templates with direct tracking buttons).
+- **SMS Integration**: Integrated with Fast2SMS API (`FAST2SMS_API_KEY`) for real-time mobile updates.
+- **Asynchronous Execution**: Notification failures are non-blocking and non-fatal.
