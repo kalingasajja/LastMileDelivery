@@ -8,9 +8,8 @@ A production-ready full-stack delivery management platform featuring a dynamic r
 
 ## 🌐 Live Deployment & Demo
 
-- **Frontend Application**: `https://lastmiledelivery-frontend-static.onrender.com`
-
-- **System Design Document**: [`system-design.md`](file:///c:/Users/kalin/LastMileDelivery/system-design.md)
+- **Frontend Application**: [https://lastmiledelivery-frontend-static.onrender.com](https://lastmiledelivery-frontend-static.onrender.com)
+- **System Design Document**: [system-design.md](file:///c:/Users/kalin/LastMileDelivery/system-design.md)
 
 ---
 
