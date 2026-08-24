@@ -102,9 +102,9 @@ export default function LandingPage() {
             <a href="#stats" className="landing-nav-link">Why Us</a>
           </div>
           <div className="landing-nav-cta">
-            {dashboardLink && (
+            {/* {dashboardLink && (
               <Link to={dashboardLink} className="btn btn-ghost btn-sm" style={{ marginRight: 4 }}>Dashboard</Link>
-            )}
+            )} */}
             <Link to="/login" className="btn btn-ghost btn-sm">Log In</Link>
             <Link to="/register" className="btn btn-primary btn-sm">Sign Up</Link>
           </div>
@@ -275,7 +275,7 @@ export default function LandingPage() {
           </p>
           <div className="cta-actions">
             {dashboardLink ? (
-              <Link to={dashboardLink} className="btn btn-primary btn-lg">Open Dashboard →</Link>
+              <Link to={dashboardLink} className="btn btn-primary btn-lg">Open Dashboard</Link>
             ) : (
               <>
                 <Link to="/register" className="btn btn-primary btn-lg cta-btn-main">Start for Free </Link>
