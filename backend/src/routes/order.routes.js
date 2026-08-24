@@ -86,6 +86,21 @@ router.post(
         pickupPincode, dropPincode, length, breadth, height, actualWeight, orderType, paymentType, rateType
       });
 
+      // Compute expected delivery date (scheduledDate)
+      const isIntraZone = breakdown.isIntraZone;
+      let daysToAdd = 1;
+      const rateKey = rateType || 'STANDARD';
+      if (rateKey === 'EXPRESS') {
+        daysToAdd = isIntraZone ? 0 : 1;
+      } else if (rateKey === 'STANDARD') {
+        daysToAdd = isIntraZone ? 1 : 2;
+      } else if (rateKey === 'ECONOMY') {
+        daysToAdd = isIntraZone ? 2 : 4;
+      }
+      const scheduledDate = new Date();
+      scheduledDate.setDate(scheduledDate.getDate() + daysToAdd);
+      scheduledDate.setHours(18, 0, 0, 0);
+
       // Create order + first tracking entry in a transaction
       const order = await prisma.$transaction(async (tx) => {
         const newOrder = await tx.order.create({
@@ -109,7 +124,8 @@ router.post(
             baseCharge: breakdown.baseCharge,
             codSurcharge: breakdown.codSurcharge,
             totalCharge: breakdown.totalCharge,
-            status: 'CREATED'
+            status: 'CREATED',
+            scheduledDate
           }
         });
 
@@ -179,7 +195,8 @@ router.get(
           customer: { select: { id: true, name: true, email: true, phone: true } },
           agent: { select: { id: true, name: true } },
           pickupZone: { select: { id: true, name: true } },
-          dropZone: { select: { id: true, name: true } }
+          dropZone: { select: { id: true, name: true } },
+          trackingHistory: { orderBy: { timestamp: 'desc' } }
         },
         orderBy: { createdAt: 'desc' }
       });

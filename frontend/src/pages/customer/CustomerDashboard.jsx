@@ -99,7 +99,11 @@ export default function CustomerDashboard() {
                 </thead>
                 <tbody>
                   {orders.map(order => (
-                    <tr key={order.id}>
+                    <tr 
+                      key={order.id} 
+                      onClick={() => navigate(`/orders/${order.id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{shortId(order.id)}</td>
                       <td>
                         <span style={{ fontSize: 13 }}>
@@ -114,7 +118,10 @@ export default function CustomerDashboard() {
                       <td>
                         <button
                           className="btn btn-ghost btn-sm"
-                          onClick={() => navigate(`/orders/${order.id}`)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // prevent double navigation trigger
+                            navigate(`/orders/${order.id}`);
+                          }}
                         >
                           Track →
                         </button>

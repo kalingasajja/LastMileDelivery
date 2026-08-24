@@ -10,12 +10,18 @@ export default function TrackOrderPage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    api.get(`/orders/${id}/track`)
-      .then(res => setOrder(res.data))
-      .catch(err => {
-        if (err?.response?.status === 404) setNotFound(true);
-      })
-      .finally(() => setLoading(false));
+    const fetchTrack = () => {
+      api.get(`/orders/${id}/track`)
+        .then(res => setOrder(res.data))
+        .catch(err => {
+          if (err?.response?.status === 404) setNotFound(true);
+        })
+        .finally(() => setLoading(false));
+    };
+
+    fetchTrack();
+    const interval = setInterval(fetchTrack, 5000);
+    return () => clearInterval(interval);
   }, [id]);
 
   if (loading) return (
@@ -100,15 +106,16 @@ export default function TrackOrderPage() {
             </div>
           )}
 
-          {order.scheduledDate && order.status === 'RESCHEDULED' && (
+          {order.scheduledDate && (
             <div style={{
               marginTop: 16, padding: '12px 16px',
-              background: 'rgba(245,158,11,0.08)',
+              background: order.status === 'RESCHEDULED' ? 'rgba(245,158,11,0.08)' : 'rgba(37,99,235,0.08)',
               borderRadius: 'var(--radius)',
-              border: '1px solid rgba(245,158,11,0.2)',
-              fontSize: 14, color: '#f59e0b'
+              border: `1px solid ${order.status === 'RESCHEDULED' ? 'rgba(245,158,11,0.2)' : 'rgba(37,99,235,0.2)'}`,
+              fontSize: 14, color: order.status === 'RESCHEDULED' ? '#f59e0b' : 'var(--primary)'
             }}>
-              Rescheduled for: {formatDate(order.scheduledDate)}
+              {order.status === 'RESCHEDULED' ? 'Rescheduled for: ' : 'Expected Delivery Time: '}
+              <strong>{formatDate(order.scheduledDate)}</strong>
             </div>
           )}
         </div>

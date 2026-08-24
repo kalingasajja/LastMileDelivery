@@ -23,7 +23,11 @@ export default function OrderDetailPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchOrder(); }, [id]);
+  useEffect(() => {
+    fetchOrder();
+    const interval = setInterval(fetchOrder, 5000);
+    return () => clearInterval(interval);
+  }, [id]);
 
   const handleReschedule = async () => {
     if (!rescheduleDate) return;
@@ -182,6 +186,22 @@ export default function OrderDetailPage() {
                 <div className="charge-row total"><span>Total</span><span style={{ color: 'var(--primary-light)' }}>{formatCurrency(order.totalCharge)}</span></div>
               </div>
             </div>
+
+            {order.scheduledDate && (
+              <div className="card" style={{ marginBottom: 16 }}>
+                <h4 style={{ color: 'var(--text-secondary)', fontSize: 12, fontWeight: 600, textTransform: 'uppercase', marginBottom: 12 }}>
+                  Delivery Schedule
+                </h4>
+                <div style={{ fontSize: 14 }}>
+                  <div style={{ fontWeight: 600, color: 'var(--primary-light)' }}>
+                    {formatDate(order.scheduledDate)}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+                    {order.status === 'RESCHEDULED' ? 'Rescheduled by Customer' : 'Estimated Delivery Time'}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {order.agent && (
               <div className="card">
