@@ -6,7 +6,7 @@ const services = [
   {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
       </svg>
     ),
     title: 'Real-Time Tracking',
@@ -16,7 +16,7 @@ const services = [
   {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+        <rect x="1" y="3" width="15" height="13" /><polygon points="16 8 20 8 23 11 23 16 16 16 16 8" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
       </svg>
     ),
     title: 'Smart Dispatch',
@@ -26,7 +26,7 @@ const services = [
   {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
       </svg>
     ),
     title: 'Dynamic Pricing',
@@ -36,7 +36,7 @@ const services = [
   {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
     title: 'Multi-Role Access',
@@ -46,7 +46,7 @@ const services = [
   {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
       </svg>
     ),
     title: 'Live Analytics',
@@ -56,7 +56,7 @@ const services = [
   {
     icon: (
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
       </svg>
     ),
     title: 'Zone Management',
@@ -83,8 +83,8 @@ export default function LandingPage() {
 
   const dashboardLink =
     user?.role === 'ADMIN' ? '/admin' :
-    user?.role === 'AGENT' ? '/agent' :
-    user ? '/dashboard' : null;
+      user?.role === 'AGENT' ? '/agent' :
+        user ? '/dashboard' : null;
 
   return (
     <div className="landing-root">
@@ -124,7 +124,7 @@ export default function LandingPage() {
           <div className="hero-content">
             <div className="hero-badge">
               <span className="hero-badge-dot" />
-              Intelligent Last-Mile Delivery Platform
+
             </div>
 
             <h1 className="hero-title">
@@ -133,13 +133,13 @@ export default function LandingPage() {
             </h1>
 
             <p className="hero-subtitle">
-              A complete delivery management platform — instant pricing, smart agent dispatch,
+              A complete delivery management platform - instant pricing, smart agent dispatch,
               real-time order tracking and multi-role dashboards. All in one place.
             </p>
 
             <div className="hero-actions">
               <Link to={dashboardLink || '/register'} className="btn btn-primary btn-lg hero-btn-primary">
-                Get Started →
+                Get Started
               </Link>
               {!user && (
                 <Link to="/login" className="btn btn-ghost btn-lg">
@@ -148,14 +148,7 @@ export default function LandingPage() {
               )}
             </div>
 
-            <div className="hero-trust">
-              <div className="hero-trust-avatars">
-                {['A','B','C','D'].map((l, i) => (
-                  <div key={i} className="hero-avatar" style={{ background: ['#6366f1','#06b6d4','#10b981','#f59e0b'][i] }}>{l}</div>
-                ))}
-              </div>
-              <span>Trusted by logistics teams worldwide</span>
-            </div>
+
           </div>
 
           <div className="hero-visual">
@@ -175,10 +168,10 @@ export default function LandingPage() {
                   <div className="css-art-van-wheel css-art-van-wheel-l" />
                   <div className="css-art-van-wheel css-art-van-wheel-r" />
                 </div>
-                {[0,1,2,3].map(i => (
+                {[0, 1, 2, 3].map(i => (
                   <div key={i} className={`css-art-node css-art-node-${i}`} />
                 ))}
-                {[0,1,2].map(i => (
+                {[0, 1, 2].map(i => (
                   <div key={i} className={`css-art-pulse css-art-pulse-${i}`} />
                 ))}
               </div>
@@ -226,7 +219,7 @@ export default function LandingPage() {
             <div className="landing-eyebrow">What We Offer</div>
             <h2 className="landing-section-title">Everything Your Delivery Operation Needs</h2>
             <p className="landing-section-subtitle">
-              From order creation to final delivery — every step is covered with intelligent automation.
+              From order creation to final delivery - every step is covered with intelligent automation.
             </p>
           </div>
 
@@ -285,7 +278,7 @@ export default function LandingPage() {
               <Link to={dashboardLink} className="btn btn-primary btn-lg">Open Dashboard →</Link>
             ) : (
               <>
-                <Link to="/register" className="btn btn-primary btn-lg cta-btn-main">Start for Free →</Link>
+                <Link to="/register" className="btn btn-primary btn-lg cta-btn-main">Start for Free </Link>
                 <Link to="/login" className="btn btn-ghost btn-lg">Log In</Link>
               </>
             )}

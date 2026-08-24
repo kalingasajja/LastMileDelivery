@@ -2,6 +2,39 @@ const prisma = require('../lib/prisma');
 const { detectZoneByPincode } = require('./zoneDetector');
 
 /**
+ * Estimate distance in kilometers between two 6-digit pincodes.
+ * Deterministic heuristic function used as a fallback/priority pricing option.
+ */
+function estimatePincodeDistance(pickupPincode, dropPincode) {
+  const pin1 = String(pickupPincode).trim();
+  const pin2 = String(dropPincode).trim();
+
+  if (pin1 === pin2) return 1.5;
+
+  const val1 = parseInt(pin1, 10);
+  const val2 = parseInt(pin2, 10);
+
+  if (isNaN(val1) || isNaN(val2)) {
+    return 15.0; // safe default fallback distance
+  }
+
+  if (pin1.substring(0, 3) === pin2.substring(0, 3)) {
+    const diff = Math.abs(parseInt(pin1.slice(3), 10) - parseInt(pin2.slice(3), 10));
+    return parseFloat((2 + (isNaN(diff) ? 0 : diff % 8)).toFixed(2));
+  }
+  if (pin1.substring(0, 2) === pin2.substring(0, 2)) {
+    const diff = Math.abs(parseInt(pin1.slice(2), 10) - parseInt(pin2.slice(2), 10));
+    return parseFloat((10 + (isNaN(diff) ? 0 : diff % 40)).toFixed(2));
+  }
+  if (pin1.substring(0, 1) === pin2.substring(0, 1)) {
+    const diff = Math.abs(parseInt(pin1.slice(1), 10) - parseInt(pin2.slice(1), 10));
+    return parseFloat((50 + (isNaN(diff) ? 0 : diff % 250)).toFixed(2));
+  }
+  const diff = Math.abs(val1 - val2);
+  return parseFloat((300 + (diff % 1200)).toFixed(2));
+}
+
+/**
  * RATE CALCULATION ENGINE
  * ─────────────────────────────────────────────────────────────────
  * 

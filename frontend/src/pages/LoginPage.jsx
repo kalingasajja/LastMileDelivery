@@ -70,9 +70,9 @@ export default function LoginPage() {
           <button
             id="login-submit"
             type="submit"
-            className="btn btn-primary w-full"
+            className="btn btn-primary w-full justify-content-center"
             disabled={loading}
-            style={{ marginTop: 8 }}
+            style={{ marginTop: 8, textAlign: 'center' }}
           >
             {loading ? <><span className="spinner" /> Signing in...</> : 'Sign In'}
           </button>
@@ -83,12 +83,12 @@ export default function LoginPage() {
           <Link to="/register" style={{ color: '#60a5fa', fontWeight: 600 }}>Register</Link>
         </p>
 
-        <div style={{ marginTop: 20, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+        {/* <div style={{ marginTop: 20, padding: '12px 16px', background: 'rgba(255,255,255,0.05)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
           <strong style={{ color: 'rgba(255,255,255,0.6)' }}>Demo credentials:</strong><br />
           Admin: admin@lastmile.com / admin123<br />
           Customer: customer@test.com / customer123<br />
           Agent: agent1@lastmile.com / agent123
-        </div>
+        </div> */}
       </div>
     </div>
   );
