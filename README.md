@@ -113,8 +113,8 @@ The system supports multi-city delivery networks seeded out-of-the-box:
 ## 🚀 Setup Guide
 
 ### Prerequisites
-- Node.js >= 18
-- PostgreSQL Database
+- Node.js >= 18 with express and prisma ORM
+- PostgreSQL Database 
 
 ### 1. Clone & Install Dependencies
 ```bash
